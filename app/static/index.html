@@ -390,6 +390,11 @@
           <div class="score-value" id="global-score">0%</div>
         </div>
 
+        <div id="rapport-box" style="background:#f0f7e8;border-left:4px solid #86BC25;border-radius:8px;padding:14px 18px;margin:14px 0;">
+          <div style="font-size:0.8rem;font-weight:700;color:#3d5c14;margin-bottom:6px;">SYNTHÈSE POUR LE GESTIONNAIRE</div>
+          <div id="rapport-text" style="font-size:0.92rem;line-height:1.55;white-space:pre-wrap;color:#2b2b2b;"></div>
+        </div>
+
         <div class="layers-grid" id="layers-grid"></div>
 
         <div class="preview-wrapper" id="preview-wrapper" style="display:none;">
@@ -509,6 +514,7 @@
       const scoreEl = document.getElementById("global-score");
       scoreEl.textContent = `${pct}%`;
       scoreEl.style.color = scoreColor(data.score_global || 0);
+      document.getElementById("rapport-text").textContent = data.rapport_lisible || "";
       document.getElementById("recommendation-text").textContent = data.recommandation || "";
 
       const layersGrid = document.getElementById("layers-grid");
