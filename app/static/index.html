@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScellIA — Instruction Forensique de Sinistres Auto</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --border: #e2e6ea;
+      --text: #111827;
+      --muted: #5b6472;
+      --accent: #86BC25;
+      --accent-dark: #6fa01b;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --ok: #15803d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 28px auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 920px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 26px 16px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--surface);
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 16px;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: #f4fae8;
+    }
+
+    .dropzone p {
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #374151;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: #fff;
+      color: var(--text);
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-dark);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .badge-wait { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .badge-ok { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .badge-warn { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+    .badge-err { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+    .score-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .score-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .layers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .layer-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+    .layer-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .bar-track {
+      height: 7px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .preview-wrapper {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #111;
+      margin-bottom: 16px;
+    }
+
+    .preview-wrapper img {
+      display: block;
+      max-width: 100%;
+      max-height: 360px;
+      width: auto;
+      height: auto;
+    }
+
+    .overlay-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .suspect-box {
+      position: absolute;
+      border: 2px solid #ef4444;
+      background: rgba(239, 68, 68, 0.22);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    }
+
+    .proof-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .proof-item {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.86rem;
+      background: var(--surface);
+    }
+
+    .proof-tag {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      color: var(--accent-dark);
+      margin-right: 6px;
+    }
+
+    .decision-box {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+
+    .decision-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-validate { background: var(--accent); color: #fff; }
+    .btn-expert { background: #f59e0b; color: #fff; }
+    .btn-reject { background: #dc2626; color: #fff; }
+
+    .audit-log {
+      margin-top: 16px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.76rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+    }
+
+    .error-banner {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span>ScellIA</span>
+      <span class="subtitle">— Instruction forensique de sinistre auto</span>
+    </div>
+    <span class="badge">Deloitte × Google Cloud</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. Dépôt de la pièce</h2>
+      <div id="dropzone" class="dropzone">
+        <strong>Glisser-déposer une photo de sinistre</strong>
+        <p id="file-label">ou cliquer pour sélectionner (JPEG / PNG, max 10 Mo)</p>
+        <input id="file-input" type="file" accept="image/*" hidden />
+      </div>
+
+      <div class="field">
+        <label for="claim-type">Type de sinistre</label>
+        <select id="claim-type">
+          <option value="Collision / Choc avant">Collision / Choc avant</option>
+          <option value="Bris de glace / Pare-brise">Bris de glace / Pare-brise</option>
+          <option value="Choc latéral / Stationnement">Choc latéral / Stationnement</option>
+          <option value="Vandalisme / Rayures">Vandalisme / Rayures</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="declared-date">Date déclarée du sinistre</label>
+        <input id="declared-date" type="date" />
+      </div>
+
+      <button id="btn-instruct" class="btn-primary" disabled>Instruire le dossier</button>
+      <div id="form-error" class="error-banner"></div>
+    </section>
+
+    <section class="card" id="result-panel">
+      <div id="empty-state" class="empty-state">
+        Déposez une photo et lancez l'instruction pour générer le dossier d'expertise scellé.
+      </div>
+
+      <div id="case-content" style="display: none;">
+        <h2>
+          <span>2. Dossier d'expertise scellé <code id="case-id-label"></code></span>
+          <span id="status-badge" class="badge badge-wait">en_attente_validation_humaine</span>
+        </h2>
+
+        <div class="score-hero">
+          <div>
+            <div style="font-size:0.8rem;color:var(--muted);font-weight:600;">SCORE GLOBAL DE FRAUDE</div>
+            <div id="recommendation-text" style="font-size:0.9rem;margin-top:4px;"></div>
+          </div>
+          <div class="score-value" id="global-score">0%</div>
+        </div>
+
+        <div class="layers-grid" id="layers-grid"></div>
+
+        <div class="preview-wrapper" id="preview-wrapper" style="display:none;">
+          <img id="preview-img" alt="Pièce justificative" />
+          <div class="overlay-layer" id="overlay-layer"></div>
+        </div>
+
+        <h2 style="margin-top:4px;">Chaîne de preuves</h2>
+        <ul class="proof-list" id="proof-list"></ul>
+
+        <div class="decision-box">
+          <h2>3. Décision humaine obligatoire</h2>
+          <div class="field">
+            <label for="reviewer-name">Nom du gestionnaire / expert</label>
+            <input id="reviewer-name" type="text" placeholder="Ex. Claire Martin" />
+          </div>
+          <div class="field">
+            <label for="reject-motif">Motif (obligatoire en cas de rejet motivé)</label>
+            <input id="reject-motif" type="text" placeholder="Ex. Date EXIF antérieure et zone retouchée confirmée" />
+          </div>
+          <div class="decision-actions">
+            <button class="btn-validate" onclick="sendDecision('valider')">Valider</button>
+            <button class="btn-expert" onclick="sendDecision('expert')">Expert</button>
+            <button class="btn-reject" onclick="sendDecision('rejet_motive')">Rejet motivé</button>
+          </div>
+          <div id="decision-error" class="error-banner"></div>
+        </div>
+
+        <h2 style="margin-top:18px;">Journal d'audit (JSONL append-only)</h2>
+        <div class="audit-log" id="audit-log"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("file-input");
+    const fileLabel = document.getElementById("file-label");
+    const btnInstruct = document.getElementById("btn-instruct");
+    const declaredDateInput = document.getElementById("declared-date");
+    const formError = document.getElementById("form-error");
+    const decisionError = document.getElementById("decision-error");
+
+    declaredDateInput.value = new Date().toISOString().slice(0, 10);
+
+    let selectedFile = null;
+    let currentCaseId = null;
+    let objectUrl = null;
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      selectedFile = file;
+      fileLabel.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} Ko)`;
+      btnInstruct.disabled = false;
+      formError.style.display = "none";
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = URL.createObjectURL(file);
+    }
+
+    btnInstruct.addEventListener("click", async () => {
+      if (!selectedFile) return;
+      btnInstruct.disabled = true;
+      btnInstruct.textContent = "Instruction en cours...";
+      formError.style.display = "none";
+
+      const fd = new FormData();
+      fd.append("file", selectedFile);
+      fd.append("claim_type", document.getElementById("claim-type").value);
+      fd.append("declared_date", declaredDateInput.value);
+
+      try {
+        const resp = await fetch("/instruct", { method: "POST", body: fd });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || "Erreur lors de l'instruction");
+        renderCaseFile(data);
+        await refreshAudit(data.case_id);
+      } catch (err) {
+        formError.textContent = err.message;
+        formError.style.display = "block";
+      } finally {
+        btnInstruct.disabled = false;
+        btnInstruct.textContent = "Instruire le dossier";
+      }
+    });
+
+    function scoreColor(val) {
+      if (val >= 0.6) return "#dc2626";
+      if (val >= 0.35) return "#d97706";
+      return "#86BC25";
+    }
+
+    function renderCaseFile(data) {
+      currentCaseId = data.case_id;
+      document.getElementById("empty-state").style.display = "none";
+      document.getElementById("case-content").style.display = "block";
+      document.getElementById("case-id-label").textContent = `#${data.case_id}`;
+
+      const badge = document.getElementById("status-badge");
+      badge.textContent = data.statut;
+      badge.className = "badge badge-wait";
+
+      const pct = Math.round((data.score_global || 0) * 100);
+      const scoreEl = document.getElementById("global-score");
+      scoreEl.textContent = `${pct}%`;
+      scoreEl.style.color = scoreColor(data.score_global || 0);
+      document.getElementById("recommendation-text").textContent = data.recommandation || "";
+
+      const layersGrid = document.getElementById("layers-grid");
+      layersGrid.innerHTML = "";
+      const labels = { exif: "EXIF", c2pa: "C2PA", ela: "ELA (q=90)", vision: "Vision IA" };
+      for (const [k, v] of Object.entries(data.scores_par_couche || {})) {
+        const lp = Math.round(v * 100);
+        const box = document.createElement("div");
+        box.className = "layer-box";
+        box.innerHTML = `
+          <div class="layer-head">
+            <span>${labels[k] || k}</span>
+            <span>${lp}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${lp}%;background:${scoreColor(v)};"></div>
+          </div>
+        `;
+        layersGrid.appendChild(box);
+      }
+
+      // Image + Overlay des zones suspectes ELA
+      const wrapper = document.getElementById("preview-wrapper");
+      const img = document.getElementById("preview-img");
+      const overlay = document.getElementById("overlay-layer");
+      overlay.innerHTML = "";
+      if (objectUrl) {
+        wrapper.style.display = "inline-block";
+        img.src = objectUrl;
+        for (const z of data.zones_suspectes || []) {
+          const box = document.createElement("div");
+          box.className = "suspect-box";
+          box.style.left = `${(z.x * 100).toFixed(2)}%`;
+          box.style.top = `${(z.y * 100).toFixed(2)}%`;
+          box.style.width = `${(z.width * 100).toFixed(2)}%`;
+          box.style.height = `${(z.height * 100).toFixed(2)}%`;
+          box.title = z.reason || "Zone suspecte ELA";
+          overlay.appendChild(box);
+        }
+      }
+
+      const proofList = document.getElementById("proof-list");
+      proofList.innerHTML = "";
+      for (const p of data.preuves || []) {
+        const li = document.createElement("li");
+        li.className = "proof-item";
+        li.innerHTML = `<span class="proof-tag">[${p.couche}]</span> ${p.detail}`;
+        proofList.appendChild(li);
+      }
+      decisionError.style.display = "none";
+    }
+
+    async function sendDecision(decision) {
+      if (!currentCaseId) return;
+      decisionError.style.display = "none";
+      const reviewerName = document.getElementById("reviewer-name").value;
+      const motif = document.getElementById("reject-motif").value;
+
+      try {
+        const resp = await fetch("/decision", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            case_id: currentCaseId,
+            decision,
+            reviewer_name: reviewerName,
+            motif,
+          }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || "Erreur de décision");
+
+        const badge = document.getElementById("status-badge");
+        badge.textContent = data.statut;
+        badge.className =
+          decision === "valider"
+            ? "badge badge-ok"
+            : decision === "expert"
+            ? "badge badge-warn"
+            : "badge badge-err";
+        await refreshAudit(currentCaseId);
+      } catch (err) {
+        decisionError.textContent = err.message;
+        decisionError.style.display = "block";
+      }
+    }
+
+    async function refreshAudit(caseId) {
+      const resp = await fetch(`/audit/${caseId}`);
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const lines = (data.entries || []).map((e) => JSON.stringify(e));
+      document.getElementById("audit-log").textContent = lines.join("\n");
+    }
+  </script>
+</body>
+</html>

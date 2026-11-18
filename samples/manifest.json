@@ -1,0 +1,27 @@
+{
+  "declared_date": "2026-11-18",
+  "claim_type": "Collision / Choc avant",
+  "samples": [
+    {
+      "id": "photo_vraie",
+      "file": "samples/photo_vraie.jpg",
+      "verite_terrain": "authentique",
+      "description": "Photo prise le jour du sinistre avec EXIF complet (Apple iPhone 15 Pro, GPS) et bruit homogène.",
+      "expected_risk": "faible"
+    },
+    {
+      "id": "photo_retouchee",
+      "file": "samples/photo_retouchee.jpg",
+      "verite_terrain": "retouchee",
+      "description": "Recadrage + zone d'impact ajoutée (ELA hétérogène) + date EXIF antérieure au sinistre (2025-06-10).",
+      "expected_risk": "eleve"
+    },
+    {
+      "id": "image_generee",
+      "file": "samples/image_generee.jpg",
+      "verite_terrain": "generee_ia",
+      "description": "Absence totale d'EXIF, texture synthétique lisse, double compression JPEG.",
+      "expected_risk": "modere_a_eleve"
+    }
+  ]
+}
